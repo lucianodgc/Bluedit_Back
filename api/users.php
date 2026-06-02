@@ -10,6 +10,7 @@
 
     include_once __DIR__ . "/../database/UserDB.php";
     include_once __DIR__ . "/../models/User.php";
+    include_once __DIR__ . "/../utils/Response.php";
 
     $userDB = new UserDB();
     $userModel = new User();
@@ -24,41 +25,52 @@
             $data = json_decode($json);
 
             if ($action == "register") {
+                if (empty(trim($data->username)) || empty(trim($data->email)) || empty(trim($data->password))) {
+                    Response::sendResponse(400, false, "Todos los campos obligatorios deben estar completos.");
+                }
+
                 $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
-                $newUser = $userModel->create($data->username, $data->email, $data->password, $avatar);
-                echo json_encode($userDB->register($newUser));
-            } 
+                $newUser = $userModel->create(trim($data->username), trim($data->email), $data->password, $avatar);
+                $result = $userDB->register($newUser);
+                
+                if (isset($result['error'])) {
+                    Response::sendResponse(409, false, $result['error']);
+                } else {
+                    Response::sendResponse(201, true, "Usuario registrado exitosamente", ["id" => $result['id']]);
+                }
+            }
 
             else if ($action == "login") {
-                $userFound = $userDB->getByEmail($data->email);
+                if (empty(trim($data->email)) || empty(trim($data->password))) {
+                    Response::sendResponse(400, false, "Email y contraseña son obligatorios.");
+                }
+
+                $userFound = $userDB->getByEmail(trim($data->email));
                 if ($userFound && password_verify($data->password, $userFound['password'])) {
-                    echo json_encode([
-                        "success" => true,
-                        "user" => [
-                            "id" => $userFound['id'],
-                            "username" => $userFound['username'],
-                            "email" => $userFound['email'],
-                            "avatarUrl" => $userFound['avatarUrl']
-                        ]
+                    Response::sendResponse(200, true, "Login exitoso", [
+                        "id" => $userFound['id'],
+                        "username" => $userFound['username'],
+                        "email" => $userFound['email'],
+                        "avatarUrl" => $userFound['avatarUrl']
                     ]);
                 } else {
-                    echo json_encode(["error" => "Credenciales incorrectas"]);
+                    Response::sendResponse(401, false, "Credenciales incorrectas");
                 }
             }
 
             else if ($action == "update") {
-                if (isset($data->id) && isset($data->username)) {
+                if (isset($data->id) && isset($data->username) && !empty(trim($data->username))) {
                     $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
                     
-                    $updated = $userDB->updateProfile($data->id, $data->username, $avatar);
+                    $updated = $userDB->updateProfile($data->id, trim($data->username), $avatar);
                     
                     if ($updated) {
-                        echo json_encode(["success" => true, "message" => "Perfil actualizado con éxito"]);
+                        Response::sendResponse(200, true, "Perfil actualizado con éxito");
                     } else {
-                        echo json_encode(["error" => "No se realizaron cambios o el usuario no existe"]);
+                        Response::sendResponse(400, false, "No se realizaron cambios o el usuario no existe");
                     }
                 } else {
-                    echo json_encode(["error" => "Datos insuficientes para actualizar"]);
+                    Response::sendResponse(400, false, "Datos insuficientes o inválidos para actualizar");
                 }
             }
             break;
@@ -70,12 +82,12 @@
                     $user = $userDB->getById($userId);
                     
                     if ($user) {
-                        echo json_encode($user);
+                        Response::sendResponse(200, true, "Usuario encontrado", $user);
                     } else {
-                        echo json_encode(["error" => "Usuario no encontrado"]);
+                        Response::sendResponse(404, false, "Usuario no encontrado");
                     }
                 } else {
-                    echo json_encode(["error" => "Falta el ID del usuario"]);
+                    Response::sendResponse(400, false, "Falta el ID del usuario");
                 }
             }
             break;
@@ -86,17 +98,17 @@
             if ($userId) {
                 $deleted = $userDB->deleteUser($userId);
                 if ($deleted) {
-                    echo json_encode(["success" => true, "message" => "Usuario " . $userId . " eliminado con éxito"]);
+                    Response::sendResponse(200, true, "Usuario eliminado con éxito");
                 } else {
-                    echo json_encode(["error" => "No se pudo eliminar el usuario o el ID no existe"]);
+                    Response::sendResponse(404, false, "No se pudo eliminar el usuario o el ID no existe");
                 }
             } else {
-                echo json_encode(["error" => "Falta el ID del usuario para eliminar"]);
+                Response::sendResponse(400, false, "Falta el ID del usuario para eliminar");
             }
             break;
 
         default:
-            echo json_encode(["error" => "Método no soportado"]);
+            Response::sendResponse(405, false, "Método HTTP no soportado");
             break;
     }
 ?>

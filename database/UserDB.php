@@ -14,6 +14,9 @@
             if ($this->getByEmail($user->getEmail())) {
                 return ["error" => "El email ya está registrado"];
             }
+            if ($this->getByUsername($user->getUsername())) {
+                return ["error" => "El nombre de usuario ya está ocupado"];
+            }
 
             $sql = "INSERT INTO users (username, email, password, avatar_url, created_at) VALUES (?, ?, ?, ?, ?)";
             $query = $this->mysql->prepare($sql);
@@ -46,6 +49,19 @@
             return null;
         }
 
+        public function getByUsername($username) {
+            $sql = "SELECT id FROM users WHERE username = ?";
+            $query = $this->mysql->prepare($sql);
+            $query->bind_param("s", $username);
+            $query->execute();
+
+            $result = $query->get_result();
+            if ($row = $result->fetch_assoc()) {
+                return $row;
+            }
+            return null;
+        }
+
         public function getById($id) {
             $sql = "SELECT id, username, email, avatar_url AS avatarUrl, created_at AS createdAt FROM users WHERE id = ?";
             $query = $this->mysql->prepare($sql);
@@ -60,6 +76,11 @@
         }
 
         public function updateProfile($id, $username, $avatarUrl) {
+            $existingUser = $this->getByUsername($username);
+            if ($existingUser && $existingUser['id'] != $id) {
+                return false;
+            }
+
             $sql = "UPDATE users SET username = ?, avatar_url = ? WHERE id = ?";
             $query = $this->mysql->prepare($sql);
             $query->bind_param("ssi", $username, $avatarUrl, $id);
