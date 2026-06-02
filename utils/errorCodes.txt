@@ -1,0 +1,9 @@
+Código      Concepto                 Cuándo usarlo
+200         Éxito general            Consultas (GET) y actualizaciones (PUT/PATCH).
+201         Creado                   Al insertar un registro nuevo en la BD.
+400         Petición incorrecta      Falta de datos requeridos o validación básica fallida.
+401         No autorizado            Credenciales incorrectas.
+403         Prohibido                Usuario logueado pero sin permisos para esa acción.
+404         No encontrado            El recurso solicitado por ID no existe.
+409         Conflicto                El registro ya existe.
+500         Error del servidor       Error inesperado en el código PHP.
