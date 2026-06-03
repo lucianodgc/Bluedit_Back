@@ -18,16 +18,15 @@
                 return ["error" => "El nombre de usuario ya está ocupado"];
             }
 
-            $sql = "INSERT INTO users (username, email, password, avatar_url, created_at) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)";
             $query = $this->mysql->prepare($sql);
             
             $username = $user->getUsername();
             $email = $user->getEmail();
             $password = $user->getPassword();
-            $avatar = $user->getAvatarUrl();
             $date = $user->getCreatedAt();
 
-            $query->bind_param("sssss", $username, $email, $password, $avatar, $date);
+            $query->bind_param("ssss", $username, $email, $password, $date);
             $query->execute();
 
             if ($query->affected_rows > 0) {
@@ -37,7 +36,7 @@
         }
 
         public function getByEmail($email) {
-            $sql = "SELECT id, username, email, password, avatar_url AS avatarUrl FROM users WHERE email = ?";
+            $sql = "SELECT id, username, email, password, avatar_url AS avatarUrl, location, birth_date AS birthDate, gender FROM users WHERE email = ?";
             $query = $this->mysql->prepare($sql);
             $query->bind_param("s", $email);
             $query->execute();
@@ -63,7 +62,7 @@
         }
 
         public function getById($id) {
-            $sql = "SELECT id, username, email, avatar_url AS avatarUrl, created_at AS createdAt FROM users WHERE id = ?";
+            $sql = "SELECT id, username, email, avatar_url AS avatarUrl, created_at AS createdAt, location, birth_date AS birthDate, gender FROM users WHERE id = ?";
             $query = $this->mysql->prepare($sql);
             $query->bind_param("i", $id);
             $query->execute();
@@ -75,16 +74,16 @@
             return null;
         }
 
-        public function updateProfile($id, $username, $avatarUrl) {
+        public function updateProfile($id, $username, $avatarUrl = null, $location = null, $birthDate = null, $gender = null) {
             $existingUser = $this->getByUsername($username);
             if ($existingUser && $existingUser['id'] != $id) {
                 return false;
             }
 
-            $sql = "UPDATE users SET username = ?, avatar_url = ? WHERE id = ?";
+            $sql = "UPDATE users SET username = ?, avatar_url = ?, location = ?, birth_date = ?, gender = ? WHERE id = ?";
             $query = $this->mysql->prepare($sql);
-            $query->bind_param("ssi", $username, $avatarUrl, $id);
-            
+            $query->bind_param("sssssi", $username, $avatarUrl, $location, $birthDate, $gender, $id);
+
             if ($query->execute()) {
                 return true; 
             }

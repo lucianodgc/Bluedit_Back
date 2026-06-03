@@ -29,8 +29,7 @@
                     Response::sendResponse(400, false, "Todos los campos obligatorios deben estar completos.");
                 }
 
-                $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
-                $newUser = $userModel->create(trim($data->username), trim($data->email), $data->password, $avatar);
+                $newUser = $userModel->create(trim($data->username), trim($data->email), trim($data->password));
                 $result = $userDB->register($newUser);
                 
                 if (isset($result['error'])) {
@@ -62,7 +61,11 @@
                 if (isset($data->id) && isset($data->username) && !empty(trim($data->username))) {
                     $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
                     
-                    $updated = $userDB->updateProfile($data->id, trim($data->username), $avatar);
+                    $location = isset($data->location) ? trim($data->location) : null;
+                    $birthDate = isset($data->birthDate) ? trim($data->birthDate) : null;
+                    $gender = isset($data->gender) ? trim($data->gender) : null;
+                    
+                    $updated = $userDB->updateProfile($data->id, trim($data->username), $avatar, $location, $birthDate, $gender);
                     
                     if ($updated) {
                         Response::sendResponse(200, true, "Perfil actualizado con éxito");
