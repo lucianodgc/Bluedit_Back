@@ -27,12 +27,12 @@
 
             $postObj = $post->create(trim($data->title), $data->user_id, trim($data->content), trim($data->type));
             
-            $id = $postDB->create($postObj);
+           $result = $postDB->create($postObj);
 
-            if ($id) {
-                Response::sendResponse(201, true, "Post creado exitosamente", ["id" => $id]);
+            if (isset($result['error'])) {
+               Response::sendResponse(500, false, $result['error']); 
             } else {
-                Response::sendResponse(500, false, "No se pudo crear el post");
+                Response::sendResponse(201, true, "Post creado exitosamente", ["id" => $result['id']]);
             }
         break;
 

@@ -26,9 +26,9 @@
             $query->execute();
 
             if ($query->affected_rows > 0) {
-                return $query->insert_id;
+                return ["id" => $query->insert_id];
             }
-            return false;
+            return ["error" => "No se pudo crear el post"];
         }
 
         public function getPosts() {
