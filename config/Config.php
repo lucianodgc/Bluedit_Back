@@ -1,6 +1,6 @@
 <?php
-    define('SERVER','localhost');
-    define('USER','root');
-    define('PASSWORD','');
-    define('DATABASE','bluedit');
+    require_once __DIR__ . '/../vendor/autoload.php';
+
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
 ?>

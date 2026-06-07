@@ -4,13 +4,18 @@
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
     header("Content-Type: application/json");
     
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . "/../database/PostDB.php";
+    require_once __DIR__ . "/../models/Post.php";
+    require_once __DIR__ . "/../utils/Response.php";
+    require_once __DIR__ . "/../utils/AuthMiddleware.php";
+
+    define('JWT_SECRET_KEY', $_ENV['JWT_SECRET']);
+
+
     if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         exit;
     }
-
-    include_once __DIR__ . "/../database/PostDB.php";
-    include_once __DIR__ . "/../models/Post.php";
-    include_once __DIR__ . "/../utils/Response.php";
 
     $postDB = new PostDB();
     $post = new Post();
@@ -18,6 +23,7 @@
     switch ($_SERVER["REQUEST_METHOD"]) {
 
         case "POST": 
+            validateToken();
             $json = file_get_contents('php://input');
             $data = json_decode($json);
 

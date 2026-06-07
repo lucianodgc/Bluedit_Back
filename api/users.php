@@ -4,13 +4,19 @@
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
     header("Content-Type: application/json");
     
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . "/../database/UserDB.php";
+    require_once __DIR__ . "/../models/User.php";
+    require_once __DIR__ . "/../utils/Response.php";
+    require_once __DIR__ . "/../utils/AuthMiddleware.php";
+    use Firebase\JWT\JWT;
+
+    define('JWT_SECRET_KEY', $_ENV['JWT_SECRET']);
+    
+
     if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         exit;
     }
-
-    include_once __DIR__ . "/../database/UserDB.php";
-    include_once __DIR__ . "/../models/User.php";
-    include_once __DIR__ . "/../utils/Response.php";
 
     $userDB = new UserDB();
     $userModel = new User();
@@ -45,8 +51,19 @@
                 }
 
                 $userFound = $userDB->getByEmail(trim($data->email));
+
                 if ($userFound && password_verify($data->password, $userFound['password'])) {
+                    $payload = [
+                        "iss" => "bluedit-backend",
+                        "iat" => time(),
+                        "exp" => time() + (60 * 60 * 1),
+                        "userId" => $userFound['id']
+                    ];
+
+                    $jwt = JWT::encode($payload, JWT_SECRET_KEY, 'HS256');
+
                     Response::sendResponse(200, true, "Login exitoso", [
+                        "token" => $jwt,
                         "id" => $userFound['id'],
                         "username" => $userFound['username'],
                         "email" => $userFound['email'],
@@ -58,6 +75,7 @@
             }
 
             else if ($action == "update") {
+                validateToken();
                 if (isset($data->id) && isset($data->username) && !empty(trim($data->username))) {
                     $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
                     
@@ -96,6 +114,7 @@
             break;
 
         case "DELETE":
+            validateToken();
             $userId = isset($_GET['id']) ? $_GET['id'] : null;
             
             if ($userId) {
