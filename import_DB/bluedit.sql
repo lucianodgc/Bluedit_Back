@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-06-2026 a las 01:16:55
+-- Tiempo de generación: 07-06-2026 a las 02:54:46
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -57,9 +57,9 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `title`, `content`, `type`, `votes_count`, `comments_count`, `creation_date`) VALUES
-(2, 1, 'Mi primer post en Bluedit', 'Hola a todos, este es un post de prueba enviado desde Postman para verificar la conexión.', 'text', 0, 0, '2026-06-02 19:39:49'),
-(3, 1, 'Angular y PHP son un gran equipo', 'Estoy aprendiendo a conectar mi front con el back y todo está funcionando de maravilla.', 'text', 0, 0, '2026-06-02 19:39:54'),
-(5, 2, 'Pregunta sobre el laboratorio', 'Alguien sabe cómo hacer el deploy final? Saludos desde el laboratorio.', 'text', 0, 0, '2026-06-02 19:41:10');
+(7, 10, 'Bienvenido a Bluedit', 'Este es un post de prueba.', 'text', 0, 0, '2026-06-06 22:26:34'),
+(8, 10, 'Reglas del sitio', 'Sé amable con los demás.', 'text', 0, 0, '2026-06-06 22:26:34'),
+(9, 11, 'Aprendiendo Angular', 'Angular es increíble!', 'text', 0, 0, '2026-06-06 22:26:34');
 
 -- --------------------------------------------------------
 
@@ -73,17 +73,19 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `avatar_url` varchar(255) DEFAULT NULL,
-  `created_at` datetime NOT NULL
+  `created_at` datetime NOT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `gender` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar_url`, `created_at`) VALUES
-(1, 'luciano_dev', 'luciano@test.com', '$2y$10$a.pjQ8KQzr5y.g8M60v.uejLCa1EeYrvuRD4xuEslq54mfozn.TuC', 'https://api.dicebear.com/7.x/bottts/svg?seed=luciano', '2026-06-02 17:51:01'),
-(2, 'ignacio_dev', 'igncaio@test.com', '$2y$10$gT6Kn7DEIlr96Bq7qm3wgu7VCbJNBYqceJJ9czLrJTOTb7kj3OVVq', 'https://api.dicebear.com/7.x/bottts/svg?seed=ignacio', '2026-06-02 19:40:45'),
-(4, 'Luciano', 'luciano.digiovanni@estudiantes.utec.edu.uy', '$2y$10$hrNE7MLaSIFYg/V9SYH3teWSq3vlHqDDfC8WfoE8hy1caVs1NqNGe', NULL, '2026-06-03 00:10:59');
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar_url`, `created_at`, `location`, `birth_date`, `gender`) VALUES
+(10, 'admin', 'admin@bluedit.com', '$2y$10$v.EtLVqD.jNXp1i0fdi/E.BTfHoIf19RZK4ylT0zTcM0a6CQKAtfe', NULL, '2026-06-06 22:26:34', NULL, NULL, NULL),
+(11, 'juan_dev', 'juan@test.com', '$2y$10$sI1xayFaAUaF9wUBtBJNzO5bOZDM.yq6LFd3yLBzAwD9BJzW2MAUm', NULL, '2026-06-06 22:26:34', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -145,13 +147,13 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT de la tabla `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Restricciones para tablas volcadas
