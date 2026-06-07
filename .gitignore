@@ -1,0 +1,14 @@
+# --- Dependencias ---
+/vendor/
+
+# --- Variables de entorno (¡CRÍTICO!) ---
+.env
+
+# --- Archivos de IDE y sistema ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Logs y archivos temporales ---
+*.log
