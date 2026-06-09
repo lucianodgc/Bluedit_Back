@@ -74,15 +74,10 @@
             return null;
         }
 
-        public function updateProfile($id, $username, $avatarUrl = null, $location = null, $birthDate = null, $gender = null) {
-            $existingUser = $this->getByUsername($username);
-            if ($existingUser && $existingUser['id'] != $id) {
-                return false;
-            }
-
-            $sql = "UPDATE users SET username = ?, avatar_url = ?, location = ?, birth_date = ?, gender = ? WHERE id = ?";
+        public function updateProfile($id, $avatarUrl = null, $location = null, $birthDate = null, $gender = null) {
+            $sql = "UPDATE users SET avatar_url = ?, location = ?, birth_date = ?, gender = ? WHERE id = ?";
             $query = $this->mysql->prepare($sql);
-            $query->bind_param("sssssi", $username, $avatarUrl, $location, $birthDate, $gender, $id);
+            $query->bind_param("ssssi", $avatarUrl, $location, $birthDate, $gender, $id);
 
             if ($query->execute()) {
                 return true; 

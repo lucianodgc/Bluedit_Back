@@ -1,9 +1,6 @@
 <?php
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-    header("Content-Type: application/json");
-    
+    require_once __DIR__ . '/cors.php';
+
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . "/../database/UserDB.php";
     require_once __DIR__ . "/../models/User.php";
@@ -76,15 +73,38 @@
 
             else if ($action == "update") {
                 validateToken();
-                if (isset($data->id) && isset($data->username) && !empty(trim($data->username))) {
-                    $avatar = isset($data->avatar_url) ? $data->avatar_url : null;
+                $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+
+                if ($id) {
+
+                    $location = (isset($_POST['location']) && trim($_POST['location']) !== '' && trim($_POST['location']) !== 'null') ? trim($_POST['location']) : null;
+                    $birthDate = (isset($_POST['birthDate']) && trim($_POST['birthDate']) !== '' && trim($_POST['birthDate']) !== 'null') ? trim($_POST['birthDate']) : null;
+                    $gender = (isset($_POST['gender']) && trim($_POST['gender']) !== '' && trim($_POST['gender']) !== 'null') ? trim($_POST['gender']) : null;
                     
-                    $location = isset($data->location) ? trim($data->location) : null;
-                    $birthDate = isset($data->birthDate) ? trim($data->birthDate) : null;
-                    $gender = isset($data->gender) ? trim($data->gender) : null;
+                    $currentUser = $userDB->getById($id);
+                    $avatarUrl = $currentUser ? $currentUser['avatarUrl'] : null;
+
+                    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                        $fileTmpPath = $_FILES['avatar']['tmp_name'];
+                        $fileName = $_FILES['avatar']['name'];
+                        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                        $newFileName = "avatar_" . $id . "_" . time() . "." . $fileExtension;
+
+                        $uploadFileDir = __DIR__ . '/../uploads/';
+                        
+                        if (!is_dir($uploadFileDir)) {
+                            mkdir($uploadFileDir, 0755, true);
+                        }
+
+                        $dest_path = $uploadFileDir . $newFileName;
+
+                        if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                            $avatarUrl = "uploads/" . $newFileName;
+                        }
+                    }
                     
-                    $updated = $userDB->updateProfile($data->id, trim($data->username), $avatar, $location, $birthDate, $gender);
-                    
+                    $updated = $userDB->updateProfile($id, $avatarUrl, $location, $birthDate, $gender);
                     if ($updated) {
                         Response::sendResponse(200, true, "Perfil actualizado con éxito");
                     } else {

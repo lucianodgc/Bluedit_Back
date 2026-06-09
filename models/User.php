@@ -27,7 +27,7 @@
             $this->email = $email;
             $this->password = password_hash($password, PASSWORD_BCRYPT);
             $this->avatar_url = $avatar_url;
-            $this->created_at = date('Y-m-d H:i:s');
+            $this->created_at = date('Y-m-d');
             return $this;
         }
 
