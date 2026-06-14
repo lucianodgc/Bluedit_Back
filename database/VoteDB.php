@@ -43,6 +43,7 @@ class VoteDB {
         $query = $this->mysql->prepare($sql);
         $query->bind_param("ii", $postId, $postId);
         
+        $this->mysql->commit();
         return $query->execute();
     }
 }
