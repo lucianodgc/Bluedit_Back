@@ -31,37 +31,46 @@
             return ["error" => "No se pudo crear el post"];
         }
 
-        public function getPosts() {
+        public function getPosts($currentUserId = null) {
             $sql = "SELECT p.id, p.title, p.content, p.type,
                         p.user_id AS userId, 
                         p.votes_count AS votesCount, 
                         p.comments_count AS commentsCount, 
                         p.creation_date AS createdAt, 
                         u.username,
-                        u.avatar_url AS avatarUrl
+                        u.avatar_url AS avatarUrl,
+                        v.vote_type AS userLoggedVote
                     FROM posts p 
                     INNER JOIN users u ON p.user_id = u.id 
-                    ORDER BY p.creation_date DESC";
-                    
-            $result = $this->mysql->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC); 
-        }
-
-        public function getPostsByUserId($userId) {
-            $sql = "SELECT p.id, p.title, p.content, p.type,
-                        p.user_id AS userId, 
-                        p.votes_count AS votesCount, 
-                        p.comments_count AS commentsCount, 
-                        p.creation_date AS createdAt, 
-                        u.username,
-                        u.avatar_url AS avatarUrl
-                    FROM posts p 
-                    INNER JOIN users u ON p.user_id = u.id 
-                    WHERE p.user_id = ? 
+                    LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
                     ORDER BY p.creation_date DESC";
                     
             $query = $this->mysql->prepare($sql);
-            $query->bind_param("i", $userId);
+            $userIdToBind = $currentUserId ?? 0; 
+            $query->bind_param("i", $userIdToBind);
+            $query->execute();
+            $result = $query->get_result();
+            return $result->fetch_all(MYSQLI_ASSOC); 
+        }
+
+        public function getPostsByUserId($userId, $currentUserId = null) {
+            $sql = "SELECT p.id, p.title, p.content, p.type,
+                        p.user_id AS userId, 
+                        p.votes_count AS votesCount, 
+                        p.comments_count AS commentsCount, 
+                        p.creation_date AS createdAt, 
+                        u.username,
+                        u.avatar_url AS avatarUrl,
+                        v.vote_type AS userLoggedVote
+                    FROM posts p 
+                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
+                    WHERE p.user_id = ? 
+                    ORDER BY p.creation_date DESC";
+
+            $query = $this->mysql->prepare($sql);
+            $currentUserIdToBind = $currentUserId ?? 0;
+            $query->bind_param("ii", $currentUserIdToBind, $userId);
             $query->execute();
             
             $result = $query->get_result();
