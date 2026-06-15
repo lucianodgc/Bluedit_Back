@@ -52,4 +52,3 @@
         public function getGender() { return $this->gender; }
         public function setGender($gender) { $this->gender = $gender; }
     }
-?>

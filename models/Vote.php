@@ -23,4 +23,3 @@
 
         public function getVoteType() { return $this->vote_type; }
     }
-?>

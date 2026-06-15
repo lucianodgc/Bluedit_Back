@@ -33,4 +33,3 @@ function validateToken() {
     Response::sendResponse(401, false, "No autorizado. Token no recibido por PHP.");
     exit;
 }
-?>
