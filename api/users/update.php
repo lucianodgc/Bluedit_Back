@@ -22,7 +22,7 @@
 
             $newFileName = "avatar_" . $id . "_" . time() . "." . $fileExtension;
 
-            $uploadFileDir = __DIR__ . '/../uploads/';
+            $uploadFileDir = __DIR__ . '/../../uploads/';
             
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0755, true);
