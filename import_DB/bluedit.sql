@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-06-2026 a las 02:54:46
+-- Tiempo de generación: 16-06-2026 a las 22:45:41
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -30,9 +30,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `comments` (
   `id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `content` text NOT NULL,
-  `created_at` datetime NOT NULL
+  `creation_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -43,7 +43,7 @@ CREATE TABLE `comments` (
 
 CREATE TABLE `posts` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
   `type` enum('text','multimedia') NOT NULL,
@@ -51,15 +51,6 @@ CREATE TABLE `posts` (
   `comments_count` int(11) DEFAULT 0,
   `creation_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `posts`
---
-
-INSERT INTO `posts` (`id`, `user_id`, `title`, `content`, `type`, `votes_count`, `comments_count`, `creation_date`) VALUES
-(7, 10, 'Bienvenido a Bluedit', 'Este es un post de prueba.', 'text', 0, 0, '2026-06-06 22:26:34'),
-(8, 10, 'Reglas del sitio', 'Sé amable con los demás.', 'text', 0, 0, '2026-06-06 22:26:34'),
-(9, 11, 'Aprendiendo Angular', 'Angular es increíble!', 'text', 0, 0, '2026-06-06 22:26:34');
 
 -- --------------------------------------------------------
 
@@ -73,19 +64,11 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `avatar_url` varchar(255) DEFAULT NULL,
-  `created_at` datetime NOT NULL,
+  `created_at` date DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `gender` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar_url`, `created_at`, `location`, `birth_date`, `gender`) VALUES
-(10, 'admin', 'admin@bluedit.com', '$2y$10$v.EtLVqD.jNXp1i0fdi/E.BTfHoIf19RZK4ylT0zTcM0a6CQKAtfe', NULL, '2026-06-06 22:26:34', NULL, NULL, NULL),
-(11, 'juan_dev', 'juan@test.com', '$2y$10$sI1xayFaAUaF9wUBtBJNzO5bOZDM.yq6LFd3yLBzAwD9BJzW2MAUm', NULL, '2026-06-06 22:26:34', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -94,7 +77,8 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar_url`, `creat
 --
 
 CREATE TABLE `votes` (
-  `user_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `post_id` int(11) NOT NULL,
   `vote_type` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -108,15 +92,15 @@ CREATE TABLE `votes` (
 --
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `post_id` (`post_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `fk_comments_posts` (`post_id`),
+  ADD KEY `fk_comments_users` (`user_id`);
 
 --
 -- Indices de la tabla `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `fk_posts_users` (`user_id`);
 
 --
 -- Indices de la tabla `users`
@@ -130,8 +114,9 @@ ALTER TABLE `users`
 -- Indices de la tabla `votes`
 --
 ALTER TABLE `votes`
-  ADD PRIMARY KEY (`user_id`,`post_id`),
-  ADD KEY `post_id` (`post_id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id` (`user_id`,`post_id`) USING BTREE,
+  ADD KEY `fk_votes_posts` (`post_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -147,13 +132,19 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT de la tabla `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `votes`
+--
+ALTER TABLE `votes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -163,21 +154,21 @@ ALTER TABLE `users`
 -- Filtros para la tabla `comments`
 --
 ALTER TABLE `comments`
-  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_comments_posts` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_comments_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `posts`
 --
 ALTER TABLE `posts`
-  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_posts_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `votes`
 --
 ALTER TABLE `votes`
-  ADD CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_votes_posts` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_votes_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
