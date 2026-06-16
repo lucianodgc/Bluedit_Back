@@ -46,7 +46,7 @@
                    u.username,
                    u.avatar_url AS avatarUrl
             FROM comments c
-            INNER JOIN users u ON c.user_id = u.id
+            LEFT JOIN users u ON c.user_id = u.id
             WHERE c.post_id = ?
             ORDER BY c.creation_date ASC";
 

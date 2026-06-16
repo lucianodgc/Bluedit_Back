@@ -10,6 +10,7 @@
         "TRUNCATE TABLE posts",
         "TRUNCATE TABLE users",
         "TRUNCATE TABLE comments",
+        "TRUNCATE TABLE votes",
         "SET FOREIGN_KEY_CHECKS = 1"
     ];
 

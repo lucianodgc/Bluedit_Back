@@ -41,7 +41,7 @@
                         u.avatar_url AS avatarUrl,
                         v.vote_type AS userLoggedVote
                     FROM posts p 
-                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN users u ON p.user_id = u.id 
                     LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
                     ORDER BY p.creation_date DESC";
                     
@@ -63,7 +63,7 @@
                         u.avatar_url AS avatarUrl,
                         v.vote_type AS userLoggedVote
                     FROM posts p 
-                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN users u ON p.user_id = u.id 
                     LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
                     WHERE p.id = ?";
 
@@ -88,7 +88,7 @@
                         u.avatar_url AS avatarUrl,
                         v.vote_type AS userLoggedVote
                     FROM posts p 
-                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN users u ON p.user_id = u.id 
                     LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
                     ORDER BY p.votes_count DESC";
                     
@@ -110,7 +110,7 @@
                         u.avatar_url AS avatarUrl,
                         v.vote_type AS userLoggedVote
                     FROM posts p 
-                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN users u ON p.user_id = u.id 
                     LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
                     WHERE p.user_id = ? 
                     ORDER BY p.creation_date DESC";
@@ -122,5 +122,13 @@
             
             $result = $query->get_result();
             return $result->fetch_all(MYSQLI_ASSOC);
+        }
+
+        public function deletePost($postId) {
+            $sql = "DELETE FROM posts WHERE id = ?";
+            $query = $this->mysql->prepare($sql);
+            $query->bind_param('i', $postId);
+            
+            return $query->execute();
         }
     }
