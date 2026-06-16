@@ -53,6 +53,31 @@
             return $result->fetch_all(MYSQLI_ASSOC); 
         }
 
+        public function getPostById($postId, $currentUserId = null) {
+            $sql = "SELECT p.id, p.title, p.content, p.type,
+                        p.user_id AS userId, 
+                        p.votes_count AS votesCount, 
+                        p.comments_count AS commentsCount, 
+                        p.creation_date AS createdAt, 
+                        u.username,
+                        u.avatar_url AS avatarUrl,
+                        v.vote_type AS userLoggedVote
+                    FROM posts p 
+                    INNER JOIN users u ON p.user_id = u.id 
+                    LEFT JOIN votes v ON p.id = v.post_id AND v.user_id = ?
+                    WHERE p.id = ?";
+
+            $query = $this->mysql->prepare($sql);
+            
+            $currentUserIdToBind = $currentUserId ?? 0;
+            
+            $query->bind_param("ii", $currentUserIdToBind, $postId);
+            $query->execute();
+            
+            $result = $query->get_result();
+
+            return $result->fetch_assoc();
+        }
         public function getPostsByVotes($currentUserId = null) {
             $sql = "SELECT p.id, p.title, p.content, p.type,
                         p.user_id AS userId, 

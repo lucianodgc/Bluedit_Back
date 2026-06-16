@@ -1,14 +1,14 @@
 <?php
     require_once __DIR__ . '/../init.php';
 
-    $userDB = new UserDB();
-
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
     $userId = isset($_GET['id']) ? $_GET['id'] : null;
 
     if ($userId) {
+        $userDB = new UserDB();    
+
         $user = $userDB->getById($userId);
         
         if ($user) {

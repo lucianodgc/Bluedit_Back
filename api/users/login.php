@@ -2,14 +2,14 @@
     require_once __DIR__ . '/../init.php';
     use Firebase\JWT\JWT;
 
-    $userDB = new UserDB();
-
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
     if (empty(trim($data->email)) || empty(trim($data->password))) {
         Response::sendResponse(400, false, "Email y contraseña son obligatorios.");
     }
+
+    $userDB = new UserDB();
 
     $userFound = $userDB->getByEmail(trim($data->email));
 

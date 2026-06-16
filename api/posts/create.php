@@ -1,9 +1,6 @@
 <?php
     require_once __DIR__ . '/../init.php';
 
-    $postDB = new PostDB();
-    $post = new Post();
-
     validateToken();
     $title = $_POST['title']  ?? null;
     $type = $_POST['type']   ?? null;
@@ -33,6 +30,9 @@
     } else {
         $content = $_POST['content'] ?? null;
     }
+
+    $postDB = new PostDB();
+    $post = new Post();
 
     $postObj = $post->create($title, $userId, $content, $type);
     $id = $postDB->create($postObj);

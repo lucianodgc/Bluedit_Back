@@ -1,8 +1,6 @@
 <?php
     require_once __DIR__ . '/../init.php';
 
-    $userDB = new UserDB();
-
     validateToken();
     $id = isset($_POST['id']) ? intval($_POST['id']) : null;
 
@@ -12,6 +10,8 @@
         $birthDate = (isset($_POST['birthDate']) && trim($_POST['birthDate']) !== '' && trim($_POST['birthDate']) !== 'null') ? trim($_POST['birthDate']) : null;
         $gender = (isset($_POST['gender']) && trim($_POST['gender']) !== '' && trim($_POST['gender']) !== 'null') ? trim($_POST['gender']) : null;
         
+        $userDB = new UserDB();
+
         $currentUser = $userDB->getById($id);
         $avatarUrl = $currentUser ? $currentUser['avatarUrl'] : null;
 

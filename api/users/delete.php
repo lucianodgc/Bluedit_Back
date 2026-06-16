@@ -1,8 +1,6 @@
 <?php
     require_once __DIR__ . '/../init.php';
 
-    $userDB = new UserDB();
-
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
@@ -10,6 +8,8 @@
     $userId = isset($_GET['id']) ? $_GET['id'] : null;
     
     if ($userId) {
+        $userDB = new UserDB();
+        
         $deleted = $userDB->deleteUser($userId);
         if ($deleted) {
             Response::sendResponse(200, true, "Usuario eliminado con éxito");
