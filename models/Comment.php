@@ -38,7 +38,7 @@
             return $this->content;
         }
 
-        public function getCreationDate() {
+        public function getCreatedAt() {
             return $this->created_at;
         }
     }

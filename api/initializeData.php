@@ -1,5 +1,11 @@
 <?php
-    require_once __DIR__ . '/init.php';
+    require_once __DIR__ . '/cors.php';
+    
+    require_once __DIR__ . '/../config/Config.php';
+    require_once __DIR__ . "/../database/UserDB.php";
+    require_once __DIR__ . "/../database/PostDB.php";
+    require_once __DIR__ . "/../models/User.php";
+    require_once __DIR__ . "/../models/Post.php";
 
     $userDB = new UserDB();
     $postDB = new PostDB();

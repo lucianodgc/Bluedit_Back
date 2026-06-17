@@ -11,13 +11,13 @@
         }
 
         public function create($comment) {
-            $sql = "INSERT INTO comments (content, user_id, post_id, creation_date) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO comments (content, user_id, post_id, created_at) VALUES (?, ?, ?, ?)";
             $query = $this->mysql->prepare($sql);
             
             $content = $comment->getContent();
             $userId  = $comment->getUserId();
             $postId  = $comment->getPostId();
-            $date    = $comment->getCreationDate();
+            $date    = $comment->getCreatedAt();
 
             $query->bind_param("siis", $content, $userId, $postId, $date);
 
@@ -42,13 +42,13 @@
             $sql = "SELECT c.id, c.content,
                    c.user_id AS userId,
                    c.post_id AS postId,
-                   c.creation_date AS createdAt,
+                   c.created_at AS createdAt,
                    u.username,
                    u.avatar_url AS avatarUrl
             FROM comments c
             LEFT JOIN users u ON c.user_id = u.id
             WHERE c.post_id = ?
-            ORDER BY c.creation_date ASC";
+            ORDER BY c.created_at ASC";
 
             $query = $this->mysql->prepare($sql);
             $query->bind_param("i", $postId);
