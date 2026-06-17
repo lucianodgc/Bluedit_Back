@@ -4,21 +4,21 @@
         private $user_id;
         private $post_id;
         private $content;
-        private $created_at;
+        private $creation_date;
         
-        public function __construct($id = null, $user_id = null, $post_id = null, $content = "", $created_at = null) {
+        public function __construct($id = null, $user_id = null, $post_id = null, $content = "", $creation_date = null) {
             $this->id = $id;
             $this->user_id = $user_id;
             $this->post_id = $post_id;
             $this->content = $content;
-            $this->created_at = $created_at;
+            $this->creation_date = $creation_date;
         }
 
         public function create($user_id, $post_id, $content) {
             $this->user_id = $user_id;
             $this->post_id = $post_id;
             $this->content = $content;
-            $this->created_at = date('Y-m-d H:i:s');
+            $this->creation_date = date('Y-m-d H:i:s');
             return $this;
         }
 
@@ -38,7 +38,7 @@
             return $this->content;
         }
 
-        public function getCreatedAt() {
-            return $this->created_at;
+        public function getCreationDate() {
+            return $this->creation_date;
         }
     }
