@@ -1,30 +1,36 @@
 <?php
-    require_once __DIR__ . '/../init.php';
+require_once __DIR__ . '/../init.php';
 
+try {
     validateToken();
 
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
-    $content = $data->content ?? null;
-    $postId  = $data->postId ?? null;
-    $userId  = $data->userId ?? null;
+    if (!$data) {
+        Response::sendResponse(400, false, "El cuerpo de la solicitud no es un JSON válido.");
+        exit;
+    }
 
-    if (!$content || !$postId || !$userId) {
+    $content = isset($data->content) ? trim($data->content) : null;
+    $postId  = isset($data->postId)  ? intval($data->postId)  : null;
+    $userId  = isset($data->userId)  ? intval($data->userId)  : null;
+
+    if (empty($content) || !$postId || !$userId) {
         Response::sendResponse(400, false, "Faltan datos obligatorios para publicar el comentario.");
         exit;
     }
 
-    try {
-        $commentDB = new CommentDB();
-        $comment = new Comment();
+    $commentDB = new CommentDB();
+    $comment = new Comment();
 
-        $commentObj = $comment->create($userId, $postId, $content);
-        
-        $id = $commentDB->create($commentObj);
-        
-        Response::sendResponse(201, true, "Comentario publicado con éxito.", ['id' => $id]);
+    $commentObj = $comment->create($userId, $postId, $content);
+    $insertedId = $commentDB->create($commentObj);
+    
+    Response::sendResponse(201, true, "Comentario publicado con éxito.", ['id' => $insertedId]);
 
-    } catch (Exception $e) {
-        Response::sendResponse(500, false, "Error en el servidor: " . $e->getMessage());
-    }
+} catch (Throwable $e) {
+    // Evitamos enviar $e->getMessage() al frontend para no exponer la estructura interna
+    error_log("Error en comments/create.php: " . $e->getMessage());
+    Response::sendResponse(500, false, "Error interno del servidor al publicar el comentario.");
+}

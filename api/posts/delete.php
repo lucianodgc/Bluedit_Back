@@ -1,19 +1,26 @@
 <?php
-    require_once __DIR__ . '/../init.php';
+require_once __DIR__ . '/../init.php';
 
-    $id = isset($_GET['id']) ? $_GET['id'] : null;
+try {
+    validateToken();
+
+    $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
     if (!$id) {
-        Response::sendResponse(400, false, "Falta el ID del post", null);
+        Response::sendResponse(400, false, "Falta el ID válido del post a eliminar.");
         exit;
     }
 
     $postDB = new PostDB();
-    
-    $post = $postDB->deletePost($id);
+    $deleted = $postDB->deletePost($id);
 
-    if ($post) {
-        Response::sendResponse(200, true, "Post borrado", $post);
+    if ($deleted) {
+        Response::sendResponse(200, true, "Post eliminado correctamente.");
     } else {
-        Response::sendResponse(404, false, "Post no encontrado", null);
+        Response::sendResponse(404, false, "El post no existe o ya fue eliminado.");
     }
+
+} catch (Throwable $e) {
+    error_log("Error en posts/delete.php: " . $e->getMessage());
+    Response::sendResponse(500, false, "Error interno en la base de datos al eliminar el post.");
+}

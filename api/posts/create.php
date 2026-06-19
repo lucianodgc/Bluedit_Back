@@ -1,44 +1,75 @@
 <?php
-    require_once __DIR__ . '/../init.php';
+require_once __DIR__ . '/../init.php';
 
+try {
     validateToken();
-    $title = $_POST['title']  ?? null;
-    $type = $_POST['type']   ?? null;
-    $userId = $_POST['userId'] ?? null;
 
-    if (!$title || !$type || !$userId) {
-        Response::sendResponse(400, false, "Faltan datos obligatorios.");
+    $title  = isset($_POST['title'])  ? trim($_POST['title']) : null;
+    $type   = isset($_POST['type'])   ? trim($_POST['type'])  : null;
+    $userId = isset($_POST['userId']) ? intval($_POST['userId']) : null;
+
+    if (empty($title) || empty($type) || !$userId) {
+        Response::sendResponse(400, false, "Faltan datos obligatorios para crear el post.");
         exit;
     }
 
-    if ($type === 'multimedia' && isset($_FILES['content'])) {
-        $uploadDir = __DIR__ . '/../../uploads/';
-        
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+    $content = null;
+
+    if ($type === 'multimedia') {
+        if (!isset($_FILES['content']) || $_FILES['content']['error'] !== UPLOAD_ERR_OK) {
+            Response::sendResponse(400, false, "Falta el archivo multimedia o el archivo está dañado.");
+            exit;
         }
 
-        $filename = uniqid() . '_' . basename($_FILES['content']['name']);
-        $uploadPath = $uploadDir . $filename;
+        $fileTmpPath = $_FILES['content']['tmp_name'];
+        $fileName = $_FILES['content']['name'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-        if (move_uploaded_file($_FILES['content']['tmp_name'], $uploadPath)) {
-            $content = 'uploads/' . $filename;
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov'];
+
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            Response::sendResponse(400, false, "Extensión de archivo multimedia no permitida.");
+            exit;
+        }
+
+        $uploadDir = __DIR__ . '/../../uploads/';
+        
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+            Response::sendResponse(500, false, "Error de infraestructura al crear el directorio de subidas.");
+            exit;
+        }
+
+        if (!is_writable($uploadDir)) {
+            Response::sendResponse(500, false, "Permisos de escritura insuficientes en el servidor.");
+            exit;
+        }
+
+        $newFilename = "post_" . uniqid() . "_" . time() . "." . $fileExtension;
+        $uploadPath = $uploadDir . $newFilename;
+
+        if (move_uploaded_file($fileTmpPath, $uploadPath)) {
+            $content = 'uploads/' . $newFilename;
         } else {
-            Response::sendResponse(500, false, "Error al subir el archivo multimedia.");
+            Response::sendResponse(500, false, "No se pudo guardar el archivo multimedia en el servidor.");
             exit;
         }
     } else {
-        $content = $_POST['content'] ?? null;
+        $content = isset($_POST['content']) ? trim($_POST['content']) : null;
     }
 
     $postDB = new PostDB();
     $post = new Post();
 
     $postObj = $post->create($title, $userId, $content, $type);
-    $id = $postDB->create($postObj);
+    $insertedId = $postDB->create($postObj);
 
-    if ($id) {
-        Response::sendResponse(201, true, "Post creado", ['id' => $id]);
+    if ($insertedId) {
+        Response::sendResponse(201, true, "Post creado exitosamente", ['id' => $insertedId]);
     } else {
-        Response::sendResponse(500, false, "Error al guardar en la base de datos.");
+        Response::sendResponse(500, false, "No se pudo guardar el post en la base de datos.");
     }
+
+} catch (Throwable $e) {
+    error_log("Error en posts/create.php: " . $e->getMessage());
+    Response::sendResponse(500, false, "Error interno al intentar crear el post.");
+}

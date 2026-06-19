@@ -1,19 +1,20 @@
 <?php
-    require_once __DIR__ . '/../init.php';
+require_once __DIR__ . '/../init.php';
 
-    $postId = $_GET['postId'] ?? null;
+try {
+    $postId = isset($_GET['postId']) ? intval($_GET['postId']) : null;
 
     if (!$postId) {
-        Response::sendResponse(400, false, "Falta el ID del post obligatorio.");
+        Response::sendResponse(400, false, "Falta el ID del post para obtener los comentarios.");
         exit;
     }
 
-    try {
-        $commentDB = new CommentDB();
-        
-        $comments = $commentDB->getCommentsByPostId($postId);
+    $commentDB = new CommentDB();
+    $comments = $commentDB->getCommentsByPostId($postId);
 
-        Response::sendResponse(200, true, "Comentarios obtenidos con éxito.", $comments);
-    } catch (Exception $e) {
-        Response::sendResponse(500, false, "Error en el servidor: " . $e->getMessage());
-    }
+    Response::sendResponse(200, true, "Comentarios obtenidos con éxito.", $comments);
+
+} catch (Throwable $e) {
+    error_log("Error en comments/get_by_post.php: " . $e->getMessage());
+    Response::sendResponse(500, false, "Error interno al cargar los comentarios.");
+}
