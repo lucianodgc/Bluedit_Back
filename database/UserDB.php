@@ -96,4 +96,31 @@
             }
             return false;
         }
+
+        public function updateUsername($id, $username) {
+            $sql = "UPDATE users SET username = ? WHERE id = ?";
+            $query = $this->mysql->prepare($sql);
+            $query->bind_param("si", $username, $id);
+            return $query->execute();
+        }
+
+        public function getPasswordHash($id) {
+            $sql = "SELECT password FROM users WHERE id = ?";
+            $query = $this->mysql->prepare($sql);
+            $query->bind_param("i", $id);
+            $query->execute();
+            
+            $result = $query->get_result();
+            if ($row = $result->fetch_assoc()) {
+                return $row['password'];
+            }
+            return null;
+        }
+
+        public function updatePassword($id, $passwordHash) {
+            $sql = "UPDATE users SET password = ? WHERE id = ?";
+            $query = $this->mysql->prepare($sql);
+            $query->bind_param("si", $passwordHash, $id);
+            return $query->execute();
+        }
     }
