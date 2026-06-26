@@ -21,6 +21,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en posts/delete.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error interno en la base de datos al eliminar el post.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

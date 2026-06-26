@@ -20,6 +20,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en posts/get_by_id.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al buscar el detalle del post.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

@@ -13,8 +13,8 @@ try {
     }
 
     $content = isset($data->content) ? trim($data->content) : null;
-    $postId  = isset($data->postId)  ? intval($data->postId)  : null;
-    $userId  = isset($data->userId)  ? intval($data->userId)  : null;
+    $postId = isset($data->postId) ? intval($data->postId) : null;
+    $userId = isset($data->userId) ? intval($data->userId) : null;
 
     if (empty($content) || !$postId || !$userId) {
         Response::sendResponse(400, false, "Faltan datos obligatorios para publicar el comentario.");
@@ -26,11 +26,10 @@ try {
 
     $commentObj = $comment->create($userId, $postId, $content);
     $insertedId = $commentDB->create($commentObj);
-    
+
     Response::sendResponse(201, true, "Comentario publicado con éxito.", ['id' => $insertedId]);
 
 } catch (Throwable $e) {
-    // Evitamos enviar $e->getMessage() al frontend para no exponer la estructura interna
     error_log("Error en comments/create.php: " . $e->getMessage());
     Response::sendResponse(500, false, "Error interno del servidor al publicar el comentario.");
 }

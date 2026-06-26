@@ -10,6 +10,5 @@ try {
     Response::sendResponse(200, true, "Posts más votados obtenidos con éxito", $posts);
 
 } catch (Throwable $e) {
-    error_log("Error en posts/get_by_votes.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al cargar los posts destacados.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

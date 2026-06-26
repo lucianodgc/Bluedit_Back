@@ -9,12 +9,11 @@ try {
     $postDB = new PostDB();
 
     if ($userId) {
-    $posts = $postDB->getPostsByUserId($userId, $currentUserId);
+        $posts = $postDB->getPostsByUserId($userId, $currentUserId);
     } else {
         $posts = $postDB->getPosts($currentUserId, $search);
     }
     Response::sendResponse(200, true, "Posts obtenidos con éxito", $posts);
 } catch (Throwable $e) {
-    error_log("Error en posts/get_all.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al cargar la lista de posts.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

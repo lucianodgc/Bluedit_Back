@@ -4,8 +4,8 @@ require_once __DIR__ . '/../init.php';
 try {
     validateToken();
 
-    $title  = isset($_POST['title'])  ? trim($_POST['title']) : null;
-    $type   = isset($_POST['type'])   ? trim($_POST['type'])  : null;
+    $title = isset($_POST['title']) ? trim($_POST['title']) : null;
+    $type = isset($_POST['type']) ? trim($_POST['type']) : null;
     $userId = isset($_POST['userId']) ? intval($_POST['userId']) : null;
 
     if (empty($title) || empty($type) || !$userId) {
@@ -33,7 +33,7 @@ try {
         }
 
         $uploadDir = __DIR__ . '/../../uploads/';
-        
+
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
             Response::sendResponse(500, false, "Error de infraestructura al crear el directorio de subidas.");
             exit;
@@ -70,6 +70,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en posts/create.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error interno al intentar crear el post.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

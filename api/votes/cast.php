@@ -12,8 +12,8 @@ try {
         exit;
     }
 
-    $postId   = isset($data->postId)   ? intval($data->postId)   : null;
-    $userId   = isset($data->userId)   ? intval($data->userId)   : null;
+    $postId = isset($data->postId) ? intval($data->postId) : null;
+    $userId = isset($data->userId) ? intval($data->userId) : null;
     $voteType = isset($data->voteType) ? intval($data->voteType) : null;
 
     if ($postId === null || $userId === null || $voteType === null) {
@@ -34,6 +34,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en votes/cast.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error interno del servidor al procesar el voto.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

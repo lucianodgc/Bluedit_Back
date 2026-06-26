@@ -9,9 +9,9 @@ try {
         exit;
     }
 
-    $userDB = new UserDB();    
+    $userDB = new UserDB();
     $user = $userDB->getById($userId);
-    
+
     if ($user) {
         Response::sendResponse(200, true, "Usuario encontrado", $user);
     } else {
@@ -19,6 +19,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en get_user.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al obtener el usuario.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

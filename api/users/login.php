@@ -44,6 +44,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en login.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error interno del servidor.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

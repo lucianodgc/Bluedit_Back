@@ -31,6 +31,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en update_username.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al procesar la actualización del usuario.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

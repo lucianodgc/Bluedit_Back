@@ -49,6 +49,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en update_password.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al procesar el cambio de contraseña.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

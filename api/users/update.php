@@ -11,15 +11,15 @@ try {
         exit;
     }
 
-    $sanitize = function($value) {
+    $sanitize = function ($value) {
         $v = trim($value);
         return ($v === '' || $v === 'null' || $v === 'undefined') ? null : $v;
     };
 
-    $location  = isset($_POST['location'])  ? $sanitize($_POST['location'])  : null;
+    $location = isset($_POST['location']) ? $sanitize($_POST['location']) : null;
     $birthDate = isset($_POST['birthDate']) ? $sanitize($_POST['birthDate']) : null;
-    $gender    = isset($_POST['gender'])    ? $sanitize($_POST['gender'])    : null;
-    
+    $gender = isset($_POST['gender']) ? $sanitize($_POST['gender']) : null;
+
     $userDB = new UserDB();
     $currentUser = $userDB->getById($id);
 
@@ -43,7 +43,7 @@ try {
         }
 
         $uploadFileDir = __DIR__ . '/../../uploads/';
-        
+
         if (!is_dir($uploadFileDir) && !mkdir($uploadFileDir, 0755, true)) {
             Response::sendResponse(500, false, "Error de infraestructura en el servidor.");
             exit;
@@ -64,9 +64,9 @@ try {
             exit;
         }
     }
-    
+
     $updated = $userDB->updateProfile($id, $avatarUrl, $location, $birthDate, $gender);
-    
+
     if ($updated) {
         Response::sendResponse(200, true, "Perfil actualizado con éxito");
     } else {
@@ -74,6 +74,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en update_profile.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error interno al actualizar el perfil.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }

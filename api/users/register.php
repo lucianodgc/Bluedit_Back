@@ -32,6 +32,5 @@ try {
     }
 
 } catch (Throwable $e) {
-    error_log("Error en register.php: " . $e->getMessage());
-    Response::sendResponse(500, false, "Error al procesar el registro.");
+    Response::sendResponse(500, false, "Error real: " . $e->getMessage() . " en " . $e->getFile() . " línea " . $e->getLine());
 }
